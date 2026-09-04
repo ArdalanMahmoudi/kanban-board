@@ -5,7 +5,7 @@ export interface CardType {
 
 export interface CardList {
   id: number;
-  title: string;
+  title: "To Do" | "In Progress" |"Done";
   cards: CardType[];
 }
 export interface KanbanBoardState {
