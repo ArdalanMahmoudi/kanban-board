@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
+import { Toaster } from "react-hot-toast";
 
 const robotoHeading = Roboto({subsets:['latin'],variable:'--font-roboto'});
 
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       className={cn("h-full", "antialiased",  inter.variable, robotoHeading.variable)}
     >
       <body className="min-h-full flex flex-col bg-accent">{children}</body>
+      <Toaster/>
     </html>
   );
 }
