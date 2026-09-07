@@ -4,10 +4,9 @@ import Card from "./Card";
 import { useBoardStore } from "@/stores/board.store";
 import { AddCardButton } from "./AddCardButton";
 
-
 const List = ({ list }: { list: CardList }) => {
   const moveCard = useBoardStore((state) => state.moveCard);
-
+  const [hoverIndex, setHoverIndex] = React.useState<number | undefined>(undefined)
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -25,10 +24,18 @@ const List = ({ list }: { list: CardList }) => {
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     const cardId = e.dataTransfer.getData("cardId");
     const sourceListId = Number(e.dataTransfer.getData("sourceListId"));
-    moveCard(cardId, sourceListId, list.id);
+    moveCard(cardId, sourceListId, list.id, hoverIndex);
+    setHoverIndex(undefined)
   };
 
-
+  const handleDragOverCard = (
+    e: React.DragEvent<HTMLDivElement>,
+    targetIndex: number,
+  ) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setHoverIndex(targetIndex)
+  };
 
   return (
     <div className="h-full flex flex-col gap-4">
@@ -49,14 +56,15 @@ const List = ({ list }: { list: CardList }) => {
         </div>
       </div>
       {/* Main-card */}
-      <div className="min-h-20" onDragOver={handleDragOver} onDrop={handleDrop}>
-        {list.cards.map((card) => (
+      <div className="min-h-20 h-full border border-border" onDragOver={handleDragOver} onDrop={handleDrop}>
+        {list.cards.map((card,index) => (
           <Card
             key={card.id}
             dataCard={card}
             onDragStart={handleDragStart}
             sourceListId={list.id}
-
+            targetIndex={index}
+            onDragOver={handleDragOverCard}
           />
         ))}
       </div>

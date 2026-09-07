@@ -1,3 +1,4 @@
+import { insertCardAt } from "@/lib/helper";
 import { KanbanBoardState } from "@/lib/types/kanban.type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -21,6 +22,7 @@ export const useBoardStore = create<KanbanBoardState>()(
         cardId: string,
         sourceListId: number,
         targetListId: number,
+        targetIndex?: number,
       ) => {
         const selectedCardList = get().cardLists.find(
           (list) => list.id === sourceListId,
@@ -35,24 +37,22 @@ export const useBoardStore = create<KanbanBoardState>()(
 
         set((state) => {
           const updatedCardLists = state.cardLists.map((list) => {
-            if (sourceListId !== targetListId) {
-              if (list.id === sourceListId) {
-                return {
-                  ...list,
-                  cards: list.cards.filter((card) => card.id !== cardId),
-                };
-              }
-              if (list.id === targetListId) {
-                return {
-                  ...list,
-                  cards: [...list.cards, selectedCard],
-                };
-              }
+            if (list.id === sourceListId && list.id === targetListId) {
+              return {...list,cards:insertCardAt(list.cards.filter(card => card.id !== cardId), selectedCard, targetIndex)}
             }
+            if (list.id === sourceListId) {
+              return {
+                ...list,
+                cards: list.cards.filter((card) => card.id !== cardId),
+              };
+            }
+            if (list.id === targetListId) {
+              return {...list ,cards:insertCardAt(list.cards,selectedCard, targetIndex)}
+            }
+
             return list;
           });
           return {
-            ...state,
             cardLists: updatedCardLists,
           };
         });

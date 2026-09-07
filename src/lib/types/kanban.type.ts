@@ -10,7 +10,7 @@ export interface CardList {
 }
 export interface KanbanBoardState {
     cardLists: CardList[];
-    moveCard: (cardId: string, sourceListId: number, targetListId: number) => void;
+    moveCard: (cardId: string, sourceListId: number, targetListId: number, targetIndex?:number) => void;
     addCard:(listId:number, text:string) => void
     deleteCard:(listId:number, cardId:string) => void
 }

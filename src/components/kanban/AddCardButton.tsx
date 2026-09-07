@@ -34,7 +34,7 @@ export function AddCardButton({ listId }: { listId: number }) {
     <Dialog>
       <DialogTrigger
         render={
-          <Button variant="default">
+          <Button variant="secondary">
             <CirclePlusIcon className=" cursor-pointer size-5" />
           </Button>
         }
