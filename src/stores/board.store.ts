@@ -1,4 +1,4 @@
-import { insertCardAt } from "@/lib/helper";
+import { findByField, insertCardAt } from "@/lib/helper";
 import { KanbanBoardState } from "@/lib/types/kanban.type";
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
@@ -10,12 +10,9 @@ export const useBoardStore = create<KanbanBoardState>()(
         {
           id: 1,
           title: "To Do",
-          cards: [
-            { id: "a", text: "task 1" },
-            { id: "b", text: "task 2" },
-          ],
+          cards: [],
         },
-        { id: 2, title: "In Progress", cards: [{ id: "c", text: "task 3" }] },
+        { id: 2, title: "In Progress", cards: [] },
         { id: 3, title: "Done", cards: [] },
       ],
       moveCard: (
@@ -24,21 +21,34 @@ export const useBoardStore = create<KanbanBoardState>()(
         targetListId: number,
         targetIndex?: number,
       ) => {
-        const selectedCardList = get().cardLists.find(
-          (list) => list.id === sourceListId,
+        const selectedCardList = findByField(
+          get().cardLists,
+          "id",
+          sourceListId,
         );
+        // get().cardLists.find(
+        //   (list) => list.id === sourceListId,
+        // );
 
         if (!selectedCardList) return;
-        const selectedCard = selectedCardList.cards.find(
-          (card) => card.id === cardId,
-        );
+        const selectedCard = findByField(selectedCardList.cards, "id", cardId);
+        // selectedCardList.cards.find(
+        //   (card) => card.id === cardId,
+        // );
 
         if (!selectedCard) return;
 
         set((state) => {
           const updatedCardLists = state.cardLists.map((list) => {
             if (list.id === sourceListId && list.id === targetListId) {
-              return {...list,cards:insertCardAt(list.cards.filter(card => card.id !== cardId), selectedCard, targetIndex)}
+              return {
+                ...list,
+                cards: insertCardAt(
+                  list.cards.filter((card) => card.id !== cardId),
+                  selectedCard,
+                  targetIndex,
+                ),
+              };
             }
             if (list.id === sourceListId) {
               return {
@@ -47,7 +57,10 @@ export const useBoardStore = create<KanbanBoardState>()(
               };
             }
             if (list.id === targetListId) {
-              return {...list ,cards:insertCardAt(list.cards,selectedCard, targetIndex)}
+              return {
+                ...list,
+                cards: insertCardAt(list.cards, selectedCard, targetIndex),
+              };
             }
 
             return list;
@@ -73,14 +86,37 @@ export const useBoardStore = create<KanbanBoardState>()(
         });
       },
       deleteCard: (listId: number, cardId: string) => {
-        console.log("delete");
-
         set((state) => {
           const updateCardInList = state.cardLists.map((list) => {
             if (list.id === listId) {
               return {
                 ...list,
                 cards: list.cards.filter((card) => card.id !== cardId),
+              };
+            }
+            return list;
+          });
+          return {
+            ...state,
+            cardLists: updateCardInList,
+          };
+        });
+      },
+      editCard: (listId: number, cardId: string, text: string) => {
+        if (!text.trim()) {
+          return
+        }
+        set((state) => {
+          const updateCardInList = state.cardLists.map((list) => {
+            if (list.id === listId) {
+              return {
+                ...list,
+                cards: list.cards.map((card) => {
+                  if (card.id === cardId) {
+                    return { ...card, text };
+                  }
+                  return card;
+                }),
               };
             }
             return list;
