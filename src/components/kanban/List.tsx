@@ -3,10 +3,14 @@ import React from "react";
 import Card from "./Card";
 import { useBoardStore } from "@/stores/board.store";
 import { AddCardButton } from "./AddCardButton";
+import { CirclePlusIcon, FilePlusCornerIcon, Plus } from "lucide-react";
+import { Button } from "../ui/button";
 
 const List = ({ list }: { list: CardList }) => {
   const moveCard = useBoardStore((state) => state.moveCard);
-  const [hoverIndex, setHoverIndex] = React.useState<number | undefined>(undefined)
+  const [hoverIndex, setHoverIndex] = React.useState<number | undefined>(
+    undefined,
+  );
 
   const handleDragStart = (
     e: React.DragEvent<HTMLDivElement>,
@@ -25,7 +29,7 @@ const List = ({ list }: { list: CardList }) => {
     const cardId = e.dataTransfer.getData("cardId");
     const sourceListId = Number(e.dataTransfer.getData("sourceListId"));
     moveCard(cardId, sourceListId, list.id, hoverIndex);
-    setHoverIndex(undefined)
+    setHoverIndex(undefined);
   };
 
   const handleDragOverCard = (
@@ -34,7 +38,7 @@ const List = ({ list }: { list: CardList }) => {
   ) => {
     e.preventDefault();
     e.stopPropagation();
-    setHoverIndex(targetIndex)
+    setHoverIndex(targetIndex);
   };
 
   return (
@@ -52,21 +56,53 @@ const List = ({ list }: { list: CardList }) => {
             </p>
           </div>
           {/* Add-Task */}
-          <AddCardButton listId={list.id} />
+          <AddCardButton
+            listId={list.id}
+            DialogTriggerButton={
+              <Button variant={"default"}>
+                <CirclePlusIcon className=" cursor-pointer size-5" />
+              </Button>
+            }
+          />
         </div>
       </div>
       {/* Main-card */}
-      <div className="min-h-20 h-full border border-border" onDragOver={handleDragOver} onDrop={handleDrop}>
-        {list.cards.map((card,index) => (
-          <Card
-            key={card.id}
-            dataCard={card}
-            onDragStart={handleDragStart}
-            sourceListId={list.id}
-            targetIndex={index}
-            onDragOver={handleDragOverCard}
-          />
-        ))}
+      <div
+        className=" min-h-20 h-full  border border-border p-2 space-y-1"
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
+        {list.cards.length === 0 ? (
+          <div className="w-full text-sm text-gray-500 p-4 flex justify-center items-center h-full flex-col gap-4">
+            <FilePlusCornerIcon className="size-8" />
+            <div className="flex flex-col items-center">
+              <h3 className="text-accent-foreground font-semibold">
+                No cards yet
+              </h3>
+              <p className="text-sm">Add a card to get started.</p>
+            </div>
+            <AddCardButton
+              listId={list.id}
+              DialogTriggerButton={
+                <Button variant={"outline"} className={"text-sm"}>
+                  <Plus /> Add card
+                </Button>
+              }
+            />
+          </div>
+        ) : (
+          list.cards.map((card, index) => (
+            <Card
+              key={card.id}
+              dataCard={card}
+              onDragStart={handleDragStart}
+              sourceListId={list.id}
+              listType={list.title}
+              targetIndex={index}
+              onDragOver={handleDragOverCard}
+            />
+          ))
+        )}
       </div>
     </div>
   );

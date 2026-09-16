@@ -104,7 +104,7 @@ export const useBoardStore = create<KanbanBoardState>()(
       },
       editCard: (listId: number, cardId: string, text: string) => {
         if (!text.trim()) {
-          return
+          return;
         }
         set((state) => {
           const updateCardInList = state.cardLists.map((list) => {
@@ -127,6 +127,7 @@ export const useBoardStore = create<KanbanBoardState>()(
           };
         });
       },
+   
     }),
     { name: "cardList" },
   ),

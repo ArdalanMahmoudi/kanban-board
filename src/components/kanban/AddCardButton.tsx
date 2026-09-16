@@ -17,7 +17,7 @@ import { CirclePlusIcon } from "lucide-react";
 import React from "react";
 import toast from "react-hot-toast";
 
-export function AddCardButton({ listId }: { listId: number }) {
+export function AddCardButton({ listId, DialogTriggerButton }: { listId: number, DialogTriggerButton:React.ReactElement<HTMLButtonElement> }) {
   const [text, setText] = React.useState("");
   const addCard = useBoardStore((state) => state.addCard)
 
@@ -34,9 +34,7 @@ export function AddCardButton({ listId }: { listId: number }) {
     <Dialog>
       <DialogTrigger
         render={
-          <Button variant="secondary">
-            <CirclePlusIcon className=" cursor-pointer size-5" />
-          </Button>
+          DialogTriggerButton
         }
       />
       <DialogContent className="sm:max-w-sm">
