@@ -3,12 +3,11 @@ import { Inter, Roboto } from "next/font/google";
 import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "react-hot-toast";
+import Header from "@/components/layout/Header";
 
-const robotoHeading = Roboto({subsets:['latin'],variable:'--font-roboto'});
+const robotoHeading = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
-const inter = Inter({subsets:['latin'],variable:'--font-inter'});
-
-
+const inter = Inter({ subsets: ["latin"], variable: "--font-inter" });
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -19,10 +18,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
     <html
       lang="en"
-      className={cn("h-full", "antialiased",  inter.variable, robotoHeading.variable)}
+      className={cn(
+        "h-full",
+        "antialiased",
+        inter.variable,
+        robotoHeading.variable,
+      )}
     >
-      <body className="min-h-full flex flex-col bg-accent">{children}</body>
-      <Toaster/>
+      <body className="min-h-full flex flex-col bg-accent">
+        <Header />
+        {children}
+      </body>
+      <Toaster />
     </html>
   );
 }

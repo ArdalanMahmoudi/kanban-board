@@ -5,6 +5,8 @@ import { useBoardStore } from "@/stores/board.store";
 import toast from "react-hot-toast";
 import EditCardButton from "./EditCardButton";
 import { motion } from "framer-motion";
+import { statusColors } from "@/lib/status-colors";
+import { Input } from "../ui/input";
 
 type CardTypeProps = {
   dataCard: CardType;
@@ -30,7 +32,7 @@ const Card = ({
   const [isEditing, setIsEditing] = React.useState(false);
   const [newText, setNewText] = React.useState(dataCard.text);
   const editCard = useBoardStore((state) => state.editCard);
-
+  const colors = statusColors[listType]
   function handleIsEditCard(
     e: React.FormEvent<HTMLDivElement | HTMLButtonElement>,
   ) {
@@ -56,8 +58,10 @@ const Card = ({
   }
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14 }}
-      whileInView={{ opacity: 1, y: 0 }}
+      initial={{ opacity: 0, y: 14, scale:0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale:1 }}
+      animate={{opacity:1, y:0, scale:1}}
+      exit={{opacity:0, y:14, scale:0.95}}
       viewport={{ once: true, amount: 0.5 }}
       transition={{
         duration: 0.4,
@@ -68,7 +72,7 @@ const Card = ({
       }}
       whileTap={{ scale: 0.97 }}
       whileDrag={{ scale: 0.97 }}
-      className={`bg-white rounded-sm flex items-center justify-between  border border-border p-4 text-sm font-sans hover:cursor-text group h-16 border-l-4 ${(listType === "To Do" && "border-orange-200") || (listType === "In Progress" && "border-indigo-200") || (listType === "Done" && "border-green-200")}`}
+      className={`bg-white rounded-sm flex items-center justify-between  border p-4 text-sm font-sans hover:cursor-grab group h-16 border-l-4 ${colors.border}`}
       onDragOver={(e) => onDragOver(e, targetIndex)}
       draggable={isEditing ? false : true}
       onDragStart={(e) => onDragStart(e, dataCard.id, sourceListId)}
@@ -86,7 +90,7 @@ const Card = ({
           }}
           onKeyDown={handleEditCard}
           autoFocus
-          className="border border-border outline-0 p-2"
+          className="border border-border outline-0 p-2 "
         />
       ) : (
         <>

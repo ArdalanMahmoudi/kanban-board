@@ -9,11 +9,11 @@ export const useBoardStore = create<KanbanBoardState>()(
       cardLists: [
         {
           id: 1,
-          title: "To Do",
+          status: "To Do",
           cards: [],
         },
-        { id: 2, title: "In Progress", cards: [] },
-        { id: 3, title: "Done", cards: [] },
+        { id: 2, status: "In Progress", cards: [] },
+        { id: 3, status: "Done", cards: [] },
       ],
       moveCard: (
         cardId: string,
