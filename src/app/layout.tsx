@@ -4,6 +4,7 @@ import "./globals.css";
 import { cn } from "@/lib/utils";
 import { Toaster } from "react-hot-toast";
 import Header from "@/components/layout/Header";
+import { ThemeProvider } from "@/components/kanban/theme-provide";
 
 const robotoHeading = Roboto({ subsets: ["latin"], variable: "--font-roboto" });
 
@@ -26,8 +27,15 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       )}
     >
       <body className="min-h-full flex flex-col bg-accent">
-        <Header />
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <Header />
+          {children}
+        </ThemeProvider>
       </body>
       <Toaster />
     </html>

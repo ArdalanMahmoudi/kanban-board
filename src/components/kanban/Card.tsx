@@ -1,24 +1,26 @@
 import { CardType } from "@/lib/types/kanban.type";
-import React from "react";
+import React, { useState } from "react";
 import DeleteCardButton from "./DeleteCardButton";
 import { useBoardStore } from "@/stores/board.store";
 import toast from "react-hot-toast";
 import EditCardButton from "./EditCardButton";
 import { motion } from "framer-motion";
 import { statusColors } from "@/lib/status-colors";
-import { Input } from "../ui/input";
 
 type CardTypeProps = {
   dataCard: CardType;
   sourceListId: number;
   targetIndex: number;
-  listType:"To Do" | "In Progress" | "Done"
+  listType: "To Do" | "In Progress" | "Done";
   onDragStart: (
     e: React.DragEvent<HTMLDivElement>,
     cardId: string,
     sourceListId: number,
   ) => void;
-  onDragOver: (e: React.DragEvent<HTMLDivElement>, targetIndex: number) => void;
+  onDragOver: (
+    e: React.DragEvent<HTMLDivElement>,
+    targetIndex: number,
+  ) => void;
 };
 
 const Card = ({
@@ -32,7 +34,9 @@ const Card = ({
   const [isEditing, setIsEditing] = React.useState(false);
   const [newText, setNewText] = React.useState(dataCard.text);
   const editCard = useBoardStore((state) => state.editCard);
-  const colors = statusColors[listType]
+  const colors = statusColors[listType];
+  const [isDragging, setIsDragging] = useState(false);
+
   function handleIsEditCard(
     e: React.FormEvent<HTMLDivElement | HTMLButtonElement>,
   ) {
@@ -47,21 +51,28 @@ const Card = ({
         setNewText(dataCard.text);
         return;
       }
+
       editCard(sourceListId, dataCard.id, newText);
       toast.success("Changed Text!");
       setIsEditing(false);
     }
+
     if (e.key === "Escape") {
       setIsEditing(false);
       setNewText(dataCard.text);
     }
   }
+
   return (
     <motion.div
-      initial={{ opacity: 0, y: 14, scale:0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale:1 }}
-      animate={{opacity:1, y:0, scale:1}}
-      exit={{opacity:0, y:14, scale:0.95}}
+      layout
+      initial={{ opacity: 0, y: 14, scale: 0.95 }}
+      whileInView={{ opacity: 1, y: 0, scale: 1 }}
+      animate={{
+        scale: isDragging ? 1.05 : 1,
+        opacity: isDragging ? 0.6 : 1,
+      }}
+      exit={{ opacity: 0, y: 14, scale: 0.95 }}
       viewport={{ once: true, amount: 0.5 }}
       transition={{
         duration: 0.4,
@@ -72,10 +83,14 @@ const Card = ({
       }}
       whileTap={{ scale: 0.97 }}
       whileDrag={{ scale: 0.97 }}
-      className={`bg-white rounded-sm flex items-center justify-between  border p-4 text-sm font-sans hover:cursor-grab group h-16 border-l-4 ${colors.border}`}
+      className={`bg-card text-card-foreground rounded-sm flex items-center justify-between border p-4 text-sm font-sans hover:cursor-grab group h-16 border-l-4 ${colors.border}`}
       onDragOver={(e) => onDragOver(e, targetIndex)}
       draggable={isEditing ? false : true}
-      onDragStart={(e) => onDragStart(e, dataCard.id, sourceListId)}
+      onDragStart={(e) => {
+        onDragStart(e, dataCard.id, sourceListId);
+        setIsDragging(true);
+      }}
+      onDragEnd={() => setIsDragging(false)}
       onDoubleClick={handleIsEditCard}
     >
       {isEditing ? (
@@ -90,20 +105,22 @@ const Card = ({
           }}
           onKeyDown={handleEditCard}
           autoFocus
-          className="border border-border outline-0 p-2 "
+          className="border border-border outline-0 p-2 bg-background text-foreground"
         />
       ) : (
-        <>
         <span>{newText}</span>
-        </>
       )}
 
       <div
-        className={`flex items-center gap-2 ${isEditing ? "opacity-0" : "opacity-100"}`}
+        className={`flex items-center gap-2 ${
+          isEditing ? "opacity-0" : "opacity-100"
+        }`}
       >
-
         <EditCardButton onClick={handleIsEditCard} />
-        <DeleteCardButton listId={sourceListId} cardId={dataCard.id} />
+        <DeleteCardButton
+          listId={sourceListId}
+          cardId={dataCard.id}
+        />
       </div>
     </motion.div>
   );
