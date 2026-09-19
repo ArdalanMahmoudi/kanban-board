@@ -1,6 +1,6 @@
 "use client"
 import { CardType } from "@/lib/types/kanban.type";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import DeleteCardButton from "./DeleteCardButton";
 import { useBoardStore } from "@/stores/board.store";
 import toast from "react-hot-toast";
@@ -30,12 +30,15 @@ const Card = ({
   targetIndex,
 }: CardTypeProps) => {
   const editCard = useBoardStore((state) => state.editCard);
+  const moveCard = useBoardStore((state) => state.moveCard);
   const cardLists = useBoardStore((state) => state.cardLists);
+  const focusedCardId = useBoardStore((state) => state.focusedCardId)
+  const setFocusedCardId = useBoardStore((state) => state.setFocusedCardId)
+  const ref = useRef(null)
   const [isEditing, setIsEditing] = React.useState(false);
   const [newText, setNewText] = React.useState(dataCard.text);
   const colors = statusColors[listType];
   const [isDragging, setIsDragging] = useState(false);
-  const moveCard = useBoardStore((state) => state.moveCard);
 
   // Handle-Status-Input
   function handleIsEditCard(
@@ -81,12 +84,20 @@ const Card = ({
         return;
       }
       moveCard(dataCard.id, sourceListId, targetList?.id);
-
+      setFocusedCardId(dataCard.id)
   }
+
+  useEffect(() => {
+    if (focusedCardId === dataCard.id) {
+      ref.current?.focus()
+      setFocusedCardId(null)
+    }
+  },[focusedCardId,dataCard.id, setFocusedCardId])
 
   return (
     <motion.div
       layout
+      ref={ref}
       tabIndex={0}
       initial={{ opacity: 0, y: 14, scale: 0.95 }}
       whileInView={{ opacity: 1, y: 0, scale: 1 }}

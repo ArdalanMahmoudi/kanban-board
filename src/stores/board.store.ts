@@ -15,6 +15,10 @@ export const useBoardStore = create<KanbanBoardState>()(
         { id: 2, status: "In Progress", cards: [] },
         { id: 3, status: "Done", cards: [] },
       ],
+      focusedCardId:null,
+      setFocusedCardId:(id:string | null) => {
+        set({focusedCardId:id})
+      },
       moveCard: (
         cardId: string,
         sourceListId: number,
@@ -127,7 +131,7 @@ export const useBoardStore = create<KanbanBoardState>()(
           };
         });
       },
-   
+      
     }),
     { name: "cardList" },
   ),

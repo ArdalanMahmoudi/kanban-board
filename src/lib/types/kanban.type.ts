@@ -10,6 +10,8 @@ export interface CardList {
 }
 export interface KanbanBoardState {
     cardLists: CardList[];
+    focusedCardId:string | null;
+    setFocusedCardId:(id:string | null) => void
     moveCard: (cardId: string, sourceListId: number, targetListId: number, targetIndex?:number) => void;
     addCard:(listId:number, text:string) => void
     deleteCard:(listId:number, cardId:string) => void
