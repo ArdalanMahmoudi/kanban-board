@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { CardType } from "@/lib/types/kanban.type";
 import React, { useEffect, useRef, useState } from "react";
 import DeleteCardButton from "./DeleteCardButton";
@@ -7,6 +7,8 @@ import toast from "react-hot-toast";
 import EditCardButton from "./EditCardButton";
 import { motion } from "framer-motion";
 import { statusColors } from "@/lib/status-colors";
+import { Check } from "lucide-react";
+import { Button } from "../ui/button";
 
 type CardTypeProps = {
   dataCard: CardType;
@@ -32,9 +34,9 @@ const Card = ({
   const editCard = useBoardStore((state) => state.editCard);
   const moveCard = useBoardStore((state) => state.moveCard);
   const cardLists = useBoardStore((state) => state.cardLists);
-  const focusedCardId = useBoardStore((state) => state.focusedCardId)
-  const setFocusedCardId = useBoardStore((state) => state.setFocusedCardId)
-  const ref = useRef(null)
+  const focusedCardId = useBoardStore((state) => state.focusedCardId);
+  const setFocusedCardId = useBoardStore((state) => state.setFocusedCardId);
+  const ref = useRef(null);
   const [isEditing, setIsEditing] = React.useState(false);
   const [newText, setNewText] = React.useState(dataCard.text);
   const colors = statusColors[listType];
@@ -69,30 +71,30 @@ const Card = ({
   }
 
   function handleCardKeyDown(e: React.KeyboardEvent<HTMLDivElement>) {
-    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft" ) {
-    return
+    if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") {
+      return;
     }
-      e.preventDefault();
+    e.preventDefault();
 
-      const currentListIndex = cardLists.findIndex(
-        (list) => list.id === sourceListId,
-      );
-      const direction = e.key === "ArrowRight" ? 1 : -1
-      const targetList = cardLists[currentListIndex + direction];
+    const currentListIndex = cardLists.findIndex(
+      (list) => list.id === sourceListId,
+    );
+    const direction = e.key === "ArrowRight" ? 1 : -1;
+    const targetList = cardLists[currentListIndex + direction];
 
-      if (!targetList) {
-        return;
-      }
-      moveCard(dataCard.id, sourceListId, targetList?.id);
-      setFocusedCardId(dataCard.id)
+    if (!targetList) {
+      return;
+    }
+    moveCard(dataCard.id, sourceListId, targetList?.id);
+    setFocusedCardId(dataCard.id);
   }
 
   useEffect(() => {
     if (focusedCardId === dataCard.id) {
-      ref.current?.focus()
-      setFocusedCardId(null)
+      ref.current?.focus();
+      setFocusedCardId(null);
     }
-  },[focusedCardId,dataCard.id, setFocusedCardId])
+  }, [focusedCardId, dataCard.id, setFocusedCardId]);
 
   return (
     <motion.div
@@ -128,20 +130,38 @@ const Card = ({
       onKeyDown={handleCardKeyDown}
     >
       {isEditing ? (
-        <input
-          type="text"
-          value={newText}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-            setNewText(e.target.value)
-          }
-          onBlur={() => {
-            setNewText(dataCard.text);
-            setIsEditing(false);
-          }}
-          onKeyDown={handleEditCard}
-          autoFocus
-          className="border border-border outline-0 p-2 bg-background text-foreground"
-        />
+        <div className="flex items-center justify-between gap-3 pr-2">
+          <input
+            type="text"
+            value={newText}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+              setNewText(e.target.value)
+            }
+            onBlur={() => {
+              setNewText(dataCard.text);
+              setIsEditing(false);
+            }}
+            onKeyDown={handleEditCard}
+            autoFocus
+            className="border border-border outline-0 p-2 bg-background text-foreground"
+          />
+          <Button
+            onClick={() => {
+              if (!newText.trim()) {
+                setIsEditing(false);
+                setNewText(dataCard.text);
+                return;
+              }
+              editCard(sourceListId, dataCard.id, newText);
+              toast.success("Changed Text!");
+              setIsEditing(false);
+            }}
+            variant={"ghost"}
+            size={"icon-lg"}
+          >
+            <Check size={18} />
+          </Button>
+        </div>
       ) : (
         <span>{newText}</span>
       )}

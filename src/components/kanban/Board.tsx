@@ -7,7 +7,7 @@ const Board = () => {
     const cardLists = useBoardStore((state) => state.cardLists)
 
     return (
-        <div className='grid grid-cols-3 gap-6 h-full max-h-96 w-full '>
+        <div className='grid  grid-cols-1 lg:grid-cols-3 gap-6 h-full max-h-96 w-full '>
           {cardLists.map((list) => (
             <List key={list?.id} list={list}/>
           ))}
