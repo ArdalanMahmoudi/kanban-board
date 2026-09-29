@@ -15,21 +15,29 @@ import { TrashIcon } from "lucide-react";
 import { useBoardStore } from "@/stores/board.store";
 import toast from "react-hot-toast";
 
-export default function DeleteCardButton({ cardId, listId }: { cardId: string; listId: number }) {
+export default function DeleteCardButton({
+  cardId,
+  listId,
+}: {
+  cardId: string;
+  listId: number;
+}) {
   const deleteCard = useBoardStore((state) => state.deleteCard);
 
   function handleDelete() {
-    deleteCard(listId,cardId);
+    deleteCard(listId, cardId);
     toast.success("Card deleted!");
   }
 
   return (
     <AlertDialog>
-      <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon">
-          <TrashIcon className="size-4" />
-        </Button>
-      </AlertDialogTrigger>
+      <AlertDialogTrigger
+        render={
+          <Button variant="ghost" size="icon">
+            <TrashIcon className="size-4" />
+          </Button>
+        }
+      ></AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Are you sure?</AlertDialogTitle>

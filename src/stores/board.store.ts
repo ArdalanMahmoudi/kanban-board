@@ -15,10 +15,13 @@ export const useBoardStore = create<KanbanBoardState>()(
         { id: 2, status: "In Progress", cards: [] },
         { id: 3, status: "Done", cards: [] },
       ],
-      focusedCardId:null,
-      setFocusedCardId:(id:string | null) => {
-        set({focusedCardId:id})
+
+      focusedCardId: null,
+
+      setFocusedCardId: (id: string | null) => {
+        set({ focusedCardId: id });
       },
+
       moveCard: (
         cardId: string,
         sourceListId: number,
@@ -30,15 +33,14 @@ export const useBoardStore = create<KanbanBoardState>()(
           "id",
           sourceListId,
         );
-        // get().cardLists.find(
-        //   (list) => list.id === sourceListId,
-        // );
 
         if (!selectedCardList) return;
-        const selectedCard = findByField(selectedCardList.cards, "id", cardId);
-        // selectedCardList.cards.find(
-        //   (card) => card.id === cardId,
-        // );
+
+        const selectedCard = findByField(
+          selectedCardList.cards,
+          "id",
+          cardId,
+        );
 
         if (!selectedCard) return;
 
@@ -50,45 +52,63 @@ export const useBoardStore = create<KanbanBoardState>()(
                 cards: insertCardAt(
                   list.cards.filter((card) => card.id !== cardId),
                   selectedCard,
-                  targetIndex,
+                  targetIndex ?? list.cards.length - 1,
                 ),
               };
             }
+
             if (list.id === sourceListId) {
               return {
                 ...list,
                 cards: list.cards.filter((card) => card.id !== cardId),
               };
             }
+
             if (list.id === targetListId) {
               return {
                 ...list,
-                cards: insertCardAt(list.cards, selectedCard, targetIndex),
+                cards: insertCardAt(
+                  list.cards,
+                  selectedCard,
+                  targetIndex ?? list.cards.length,
+                ),
               };
             }
 
             return list;
           });
+
           return {
             cardLists: updatedCardLists,
           };
         });
       },
+
       addCard: (listId: number, text: string) => {
         set((state) => {
           const updateCardInList = state.cardLists.map((list) => {
             if (list.id === listId) {
-              const newCard = { id: crypto.randomUUID(), text };
-              return { ...list, cards: [...list.cards, newCard] };
+              const newCard = {
+                id: crypto.randomUUID(),
+                text,
+              };
+
+              return {
+                ...list,
+                cards: [...list.cards, newCard],
+              };
             }
+
             return list;
           });
+
           return {
             ...state,
             cardLists: updateCardInList,
           };
         });
       },
+
       deleteCard: (listId: number, cardId: string) => {
         set((state) => {
           const updateCardInList = state.cardLists.map((list) => {
@@ -98,18 +118,22 @@ export const useBoardStore = create<KanbanBoardState>()(
                 cards: list.cards.filter((card) => card.id !== cardId),
               };
             }
+
             return list;
           });
+
           return {
             ...state,
             cardLists: updateCardInList,
           };
         });
       },
+
       editCard: (listId: number, cardId: string, text: string) => {
         if (!text.trim()) {
           return;
         }
+
         set((state) => {
           const updateCardInList = state.cardLists.map((list) => {
             if (list.id === listId) {
@@ -119,19 +143,21 @@ export const useBoardStore = create<KanbanBoardState>()(
                   if (card.id === cardId) {
                     return { ...card, text };
                   }
+
                   return card;
                 }),
               };
             }
+
             return list;
           });
+
           return {
             ...state,
             cardLists: updateCardInList,
           };
         });
       },
-      
     }),
     { name: "cardList" },
   ),

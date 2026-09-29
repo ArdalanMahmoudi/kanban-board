@@ -36,7 +36,7 @@ const Card = ({
   const cardLists = useBoardStore((state) => state.cardLists);
   const focusedCardId = useBoardStore((state) => state.focusedCardId);
   const setFocusedCardId = useBoardStore((state) => state.setFocusedCardId);
-  const ref = useRef(null);
+  const ref = useRef<HTMLDivElement | null>(null);
   const [isEditing, setIsEditing] = React.useState(false);
   const [newText, setNewText] = React.useState(dataCard.text);
   const colors = statusColors[listType];
@@ -91,90 +91,77 @@ const Card = ({
 
   useEffect(() => {
     if (focusedCardId === dataCard.id) {
-      ref.current?.focus();
+      (ref.current as HTMLDivElement | null)?.focus();
       setFocusedCardId(null);
     }
   }, [focusedCardId, dataCard.id, setFocusedCardId]);
 
   return (
-    <motion.div
-      layout
-      ref={ref}
-      tabIndex={0}
-      initial={{ opacity: 0, y: 14, scale: 0.95 }}
-      whileInView={{ opacity: 1, y: 0, scale: 1 }}
-      animate={{
-        scale: isDragging ? 1.05 : 1,
-        opacity: isDragging ? 0.6 : 1,
-      }}
-      exit={{ opacity: 0, y: 14, scale: 0.95 }}
-      viewport={{ once: true, amount: 0.5 }}
-      transition={{
-        duration: 0.4,
-        ease: "backOut",
-        type: "spring",
-        stiffness: 300,
-        damping: 20,
-      }}
-      whileTap={{ scale: 0.97 }}
-      whileDrag={{ scale: 0.97 }}
-      className={`bg-card text-card-foreground rounded-sm flex items-center justify-between border p-4 text-sm font-sans hover:cursor-grab group h-16 border-l-4 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${colors.border}`}
+    <div
+      draggable={!isEditing}
       onDragOver={(e) => onDragOver(e, targetIndex)}
-      draggable={isEditing ? false : true}
       onDragStart={(e) => {
         onDragStart(e, dataCard.id, sourceListId);
         setIsDragging(true);
       }}
       onDragEnd={() => setIsDragging(false)}
-      onDoubleClick={handleIsEditCard}
-      onKeyDown={handleCardKeyDown}
     >
-      {isEditing ? (
-        <div className="flex items-center justify-between gap-3 pr-2">
-          <input
-            type="text"
-            value={newText}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              setNewText(e.target.value)
-            }
-            onBlur={() => {
-              setNewText(dataCard.text);
-              setIsEditing(false);
-            }}
-            onKeyDown={handleEditCard}
-            autoFocus
-            className="border border-border outline-0 p-2 bg-background text-foreground"
-          />
-          <Button
-            onClick={() => {
-              if (!newText.trim()) {
-                setIsEditing(false);
-                setNewText(dataCard.text);
-                return;
-              }
-              editCard(sourceListId, dataCard.id, newText);
-              toast.success("Changed Text!");
-              setIsEditing(false);
-            }}
-            variant={"ghost"}
-            size={"icon-lg"}
-          >
-            <Check size={18} />
-          </Button>
-        </div>
-      ) : (
-        <span>{newText}</span>
-      )}
-
-      <div
-        className={`flex items-center gap-2 ${
-          isEditing ? "opacity-0" : "opacity-100"
-        }`}
+      <motion.div
+        layout
+        ref={ref}
+        tabIndex={0}
+        initial={{ opacity: 0, y: 14, scale: 0.95 }}
+        whileInView={{ opacity: 1, y: 0, scale: 1 }}
+        animate={{
+          scale: isDragging ? 1.05 : 1,
+          opacity: isDragging ? 0.6 : 1,
+        }}
+        exit={{ opacity: 0, y: 14, scale: 0.95 }}
+        viewport={{ once: true, amount: 0.5 }}
+        transition={{
+          duration: 0.4,
+          ease: "backOut",
+          type: "spring",
+          stiffness: 300,
+          damping: 20,
+        }}
+        whileTap={{ scale: 0.97 }}
+        whileDrag={{ scale: 0.97 }}
+        className={`bg-card text-card-foreground rounded-sm flex items-center justify-between border p-4 text-sm font-sans hover:cursor-grab group h-16 border-l-4 focus-visible:outline-0 focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 ${colors.border}`}
+        onDoubleClick={handleIsEditCard}
+        onKeyDown={handleCardKeyDown}
       >
-        <EditCardButton onClick={handleIsEditCard} />
-        <DeleteCardButton listId={sourceListId} cardId={dataCard.id} />
-      </div>
-    </motion.div>
+        {isEditing ? (
+          <div className="flex items-center justify-between gap-3 pr-2">
+            <input
+              type="text"
+              value={newText}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+                setNewText(e.target.value)
+              }
+              onBlur={() => {
+                setNewText(dataCard.text);
+                setIsEditing(false);
+              }}
+              onKeyDown={handleEditCard}
+              autoFocus
+              className="border border-border outline-0 p-2 bg-background text-foreground"
+            />
+          </div>
+        ) : (
+          <span>{newText}</span>
+        )}
+
+        <div
+          className={`flex items-center gap-2 ${
+            isEditing ? "opacity-0" : "opacity-100"
+          }`}
+        >
+          <EditCardButton onClick={handleIsEditCard} />
+          <DeleteCardButton listId={sourceListId} cardId={dataCard.id} />
+        </div>
+      </motion.div>
+    </div>
   );
 };
 
